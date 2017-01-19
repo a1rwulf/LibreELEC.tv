@@ -164,6 +164,9 @@ makeinstall_init() {
     cp -PR $PKG_BUILD/.$TARGET_NAME/rt/librt.so* $INSTALL/usr/lib
     cp -PR $PKG_BUILD/.$TARGET_NAME/resolv/libnss_dns.so* $INSTALL/usr/lib
     cp -PR $PKG_BUILD/.$TARGET_NAME/resolv/libresolv.so* $INSTALL/usr/lib
+    cp -PR $PKG_BUILD/.$TARGET_NAME/elf/ld*.so* $INSTALL/usr/lib
+    cp -PR $PKG_BUILD/.$TARGET_NAME/dlfcn/libdl.so* $INSTALL/usr/lib
+
 
     if [ "$TARGET_ARCH" = "arm" -a "$TARGET_FLOAT" = "hard" ]; then
       ln -sf ld.so $INSTALL/usr/lib/ld-linux.so.3

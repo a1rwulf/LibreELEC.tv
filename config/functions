@@ -747,6 +747,9 @@ get_pkg_directory() {
       _ALL_DIRS+="${_DIR}\n"
       _FOUND=$((_FOUND+1))
     done
+  else
+    mkdir -p ${target_dir}/$unit_dir/${target}.wants
+    ln -sf ../${unit} ${target_dir}/$unit_dir/${target}.wants/
   fi
 
   # _FOUND multiple packages? fail

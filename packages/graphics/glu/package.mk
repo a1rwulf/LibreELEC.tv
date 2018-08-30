@@ -16,5 +16,5 @@ PKG_TOOLCHAIN="autotools"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-silent-rules \
             --disable-debug \
-            --disable-osmesa \
+            --enable-glvnd \
             --with-gnu-ld"

@@ -1,0 +1,21 @@
+diff --git a/configure.ac b/configure.ac
+index cbfd047..6839c69 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -72,13 +72,13 @@ if test "x$OSMESA" = "xyes"; then
+           ])
+ else
+     GLU_REQUIRES="gl"
+-    PKG_CHECK_MODULES(GL, [gl], [], [
++    PKG_CHECK_MODULES(GL, [glvnd], [], [
+           AC_CHECK_HEADER([GL/gl.h],
+                   [],
+                   AC_MSG_ERROR([GL not found]))
+-          AC_CHECK_LIB([GL],
++          AC_CHECK_LIB([OpenGL],
+                    [glBegin],
+-                   [GL_LIBS=-lGL],
++                   [GL_LIBS=-lOpenGL],
+                    AC_MSG_ERROR([GL required]))
+           ])
+ fi

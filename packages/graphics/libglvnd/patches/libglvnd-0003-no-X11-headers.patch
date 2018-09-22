@@ -1,0 +1,61 @@
+diff --git a/include/EGL/eglplatform.h b/include/EGL/eglplatform.h
+index 1284089..71c859b 100644
+--- a/include/EGL/eglplatform.h
++++ b/include/EGL/eglplatform.h
+@@ -95,13 +95,9 @@ typedef void*                           EGLNativeDisplayType;
+ 
+ #elif defined(__unix__)
+ 
+-/* X11 (tentative)  */
+-#include <X11/Xlib.h>
+-#include <X11/Xutil.h>
+-
+-typedef Display *EGLNativeDisplayType;
+-typedef Pixmap   EGLNativePixmapType;
+-typedef Window   EGLNativeWindowType;
++typedef void            *EGLNativeDisplayType;
++typedef khronos_uintptr_t EGLNativePixmapType;
++typedef khronos_uintptr_t EGLNativeWindowType;
+ 
+ #else
+ #error "Platform not recognized"
+diff --git a/src/EGL/libegl.c b/src/EGL/libegl.c
+index 54e3a28..1146abd 100644
+--- a/src/EGL/libegl.c
++++ b/src/EGL/libegl.c
+@@ -36,8 +36,6 @@
+ #include <unistd.h>
+ #include <sys/mman.h>
+ 
+-#include <X11/Xlib.h>
+-
+ #include "glvnd_pthread.h"
+ #include "libeglabipriv.h"
+ #include "libeglmapping.h"
+@@ -178,6 +176,7 @@ static EGLBoolean IsGbmDisplay(void *native_display)
+ 
+ static EGLBoolean IsX11Display(void *dpy)
+ {
++#if 0
+     void *alloc;
+     void *handle;
+     void *XAllocID = NULL;
+@@ -194,6 +193,9 @@ static EGLBoolean IsX11Display(void *dpy)
+     }
+ 
+     return (XAllocID != NULL && XAllocID == alloc);
++#else
++    return EGL_FALSE;
++#endif
+ }
+ 
+ static EGLBoolean IsWaylandDisplay(void *native_display)
+@@ -615,7 +617,7 @@ static EGLBoolean InternalMakeCurrentDispatch(
+ 
+     apiState = __eglCreateAPIState();
+     if (apiState == NULL) {
+-        return False;
++        return EGL_FALSE;
+     }
+ 
+     ret = __glDispatchMakeCurrent(

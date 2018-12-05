@@ -63,10 +63,10 @@
     ALSA_SUPPORT="yes"
 
   # OpenGL(X) implementation to use (no / mesa)
-    OPENGL="no"
+    OPENGL="mesa"
 
   # OpenGL-ES implementation to use (no / bcm2835-driver / gpu-viv-bin-mx6q)
-    OPENGLES="mesa"
+    OPENGLES="no"
 
   # include uvesafb support (yes / no)
     UVESAFB_SUPPORT="yes"

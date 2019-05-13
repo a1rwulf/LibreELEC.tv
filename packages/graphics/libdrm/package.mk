@@ -9,6 +9,7 @@ PKG_SHA256="77d0ccda3e10d6593398edb70b1566bfe1a23a39bd3da98ace2147692eadd123"
 PKG_LICENSE="GPL"
 PKG_SITE="http://dri.freedesktop.org"
 PKG_URL="http://dri.freedesktop.org/libdrm/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_DEPENDS_INIT="toolchain gcc:init libpciaccess"
 PKG_DEPENDS_TARGET="toolchain libpciaccess"
 PKG_LONGDESC="The userspace interface library to kernel DRM services."
 PKG_TOOLCHAIN="meson"
@@ -41,7 +42,7 @@ listcontains "$GRAPHIC_DRIVERS" "freedreno" &&
 listcontains "$GRAPHIC_DRIVERS" "etnaviv" &&
   PKG_DRM_CONFIG+=" -Detnaviv=true" || PKG_DRM_CONFIG+=" -Detnaviv=false"
 
-PKG_MESON_OPTS_TARGET="-Dlibkms=false \
+PKG_MESON_OPTS_INIT="-Dlibkms=false \
                        $PKG_DRM_CONFIG \
                        -Dcairo-tests=false \
                        -Dman-pages=false \
@@ -49,6 +50,8 @@ PKG_MESON_OPTS_TARGET="-Dlibkms=false \
                        -Dfreedreno-kgsl=false \
                        -Dinstall-test-programs=false \
                        -Dudev=false"
+
+PKG_MESON_OPTS_TARGET="$PKG_MESON_OPTS_INIT"
 
 post_makeinstall_target() {
   mkdir -p $INSTALL/usr/bin

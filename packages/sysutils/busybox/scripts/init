@@ -405,38 +405,17 @@ load_splash() {
         . /splash/splash.conf
       fi
 
-      # Select splash image based on current native resolution
-      if [ -z "$SPLASHIMAGE" ]; then
-        vres="$(fbset 2>/dev/null | awk '/geometry/ { print $3 }')"
+      /usr/sbin/plymouthd --mode=boot
+      /usr/bin/plymouth --show-splash
 
-        if [ -f /flash/oemsplash.png -o -f /flash/oemsplash-1080.png ]; then
-          if [ -n "$vres" -a -f /flash/oemsplash-$vres.png ]; then
-            SPLASHIMAGE="/flash/oemsplash-$vres.png"
-          elif [ -f /flash/oemsplash-1080.png ]; then
-            SPLASHIMAGE="/flash/oemsplash-1080.png"
-          else
-            SPLASHIMAGE="/flash/oemsplash.png"
-          fi
-        else
-          if [ -n "$vres" -a -f /splash/splash-$vres.png ]; then
-            SPLASHIMAGE="/splash/splash-$vres.png"
-          else
-            SPLASHIMAGE="/splash/splash-1080.png"
-          fi
-        fi
-      fi
-
-      if [ -n "$SPLASHIMAGE" -a -f "$SPLASHIMAGE" ]; then
-        ply-image $SPLASHIMAGE > /dev/null 2>&1
-      fi
-
-      debug_msg "Framebuffer vertical res: $vres"
-      debug_msg "Framebuffer splash image: $SPLASHIMAGE"
     fi
   fi
 }
 
 do_reboot() {
+
+  /usr/bin/plymouth change-mode --shutdown
+
   echo "System reboots now..."
 
   # syncing filesystem
@@ -689,6 +668,9 @@ check_update() {
   mkdir -p $UPDATE_DIR/.tmp &>/dev/null
   sync
 
+  /usr/bin/plymouth change-mode --updates
+  /usr/bin/plymouth system-update --progress=0
+
   echo "UPGRADE IN PROGRESS"
   echo ""
   echo "Please do not reboot or turn off your @DISTRONAME@ device!"
@@ -747,6 +729,8 @@ check_update() {
       mv "$UPDATE_IMG" $IMG_FILE
     fi
 
+    /usr/bin/plymouth system-update --progress=10
+
     LOOP=$(losetup -f)
     LOOP_NUM=$(echo $LOOP | sed 's|/dev/loop||')
     mknod $LOOP b 7 $LOOP_NUM &>/dev/null
@@ -785,6 +769,8 @@ check_update() {
   fi
 
   sync
+
+  /usr/bin/plymouth system-update --progress=20
 
   if [ ! -b "/$IMAGE_KERNEL" -a ! -f "/flash/$IMAGE_KERNEL" ] || [ ! -f "/flash/$IMAGE_SYSTEM" ]; then
     echo "Missing (target) ${IMAGE_KERNEL} or ${IMAGE_SYSTEM}!"
@@ -850,6 +836,9 @@ check_update() {
     fi
   fi
 
+
+  /usr/bin/plymouth system-update --progress=30
+
   # get sizes
   FLASH_FREE=$(df /flash/ | awk '/[0-9]%/{print $4}')
   FLASH_FREE=$(( $FLASH_FREE * 1024 ))
@@ -888,15 +877,22 @@ check_update() {
     return 0
   fi
 
+  /usr/bin/plymouth system-update --progress=40
+
   # all ok, update
   if [ -b "/$IMAGE_KERNEL" ]; then
     update_partition "Kernel" "$UPDATE_KERNEL" "/$IMAGE_KERNEL"
   else
     update_file "Kernel" "$UPDATE_KERNEL" "/flash/$IMAGE_KERNEL"
   fi
+
+  /usr/bin/plymouth system-update --progress=50
   update_file "System" "$UPDATE_SYSTEM" "/flash/$IMAGE_SYSTEM"
+  /usr/bin/plymouth system-update --progress=70
   update_bootloader
+  /usr/bin/plymouth system-update --progress=90
   do_cleanup
+  /usr/bin/plymouth system-update --progress=100
   do_reboot
 }
 
@@ -1122,6 +1118,7 @@ if [ -f /sysroot/storage/.cache/reset_oe -o -f /sysroot/storage/.cache/reset_xbm
 fi
 
 # switch to new sysroot and start real init
+/usr/bin/plymouth update-root-fs --new-root-dir=/sysroot
 exec /usr/bin/busybox switch_root /sysroot /usr/lib/systemd/systemd $INIT_ARGS $INIT_UNIT
 
 error "switch_root" "Error in initramfs. Could not switch to new root"
